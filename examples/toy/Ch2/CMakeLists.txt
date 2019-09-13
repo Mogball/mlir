@@ -13,6 +13,7 @@ add_toy_chapter(toyc-ch2
   parser/AST.cpp
   mlir/MLIRGen.cpp
   mlir/Dialect.cpp
+  thang/thang.cpp
   )
 include_directories(include/)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include/)

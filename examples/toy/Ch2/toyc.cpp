@@ -54,12 +54,13 @@ static cl::opt<enum InputType> inputType(
                           "load the input file as an MLIR file")));
 
 namespace {
-enum Action { None, DumpAST, DumpMLIR };
+enum Action { None, DumpAST, DumpMLIR, DumpMeow };
 }
 static cl::opt<enum Action> emitAction(
     "emit", cl::desc("Select the kind of output desired"),
     cl::values(clEnumValN(DumpAST, "ast", "output the AST dump")),
-    cl::values(clEnumValN(DumpMLIR, "mlir", "output the MLIR dump")));
+    cl::values(clEnumValN(DumpMLIR, "mlir", "output the MLIR dump")),
+    cl::values(clEnumValN(DumpMeow, "meow", "meow")));
 
 /// Returns a Toy AST resulting from parsing the file or a nullptr on error.
 std::unique_ptr<toy::ModuleAST> parseInputFile(llvm::StringRef filename) {
@@ -73,6 +74,21 @@ std::unique_ptr<toy::ModuleAST> parseInputFile(llvm::StringRef filename) {
   LexerBuffer lexer(buffer.begin(), buffer.end(), filename);
   Parser parser(lexer);
   return parser.ParseModule();
+}
+
+extern void doThang(llvm::StringRef buf);
+
+int dumpMeow() {
+  llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> FileOrErr =
+      llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
+  if (std::error_code EC = FileOrErr.getError()) {
+    llvm::errs() << "Could not open input file: " << EC.message() << "\n";
+    return -1;
+  }
+  auto buffer = FileOrErr.get()->getBuffer();
+  doThang(buffer);
+
+  return 0;
 }
 
 int dumpMLIR() {
@@ -136,6 +152,8 @@ int main(int argc, char **argv) {
     return dumpAST();
   case Action::DumpMLIR:
     return dumpMLIR();
+  case Action::DumpMeow:
+    return dumpMeow();
   default:
     llvm::errs() << "No action specified (parsing only?), use -emit=<action>\n";
   }
