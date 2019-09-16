@@ -76,7 +76,9 @@ std::unique_ptr<toy::ModuleAST> parseInputFile(llvm::StringRef filename) {
   return parser.ParseModule();
 }
 
+namespace meow {
 extern void doThang(llvm::StringRef buf);
+}
 
 int dumpMeow() {
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> FileOrErr =
@@ -86,7 +88,7 @@ int dumpMeow() {
     return -1;
   }
   auto buffer = FileOrErr.get()->getBuffer();
-  doThang(buffer);
+  meow::doThang(buffer);
 
   return 0;
 }
